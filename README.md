@@ -1,4 +1,4 @@
-# Color Coded Distance with Neopixel and VL53L1X on Digispark/ATTiny85
+# Color Coded Distance with Neopixel and VL53L1X on Digispark/ATTiny85 or ESP32
 
 Displays a rainbow color dependent on current distance as measured by the VL53L1X.
 Colors selection adjusted automatically to range between min and max measured distance.
