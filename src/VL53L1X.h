@@ -1261,8 +1261,10 @@ class VL53L1X
     {
       uint16_t range_mm;
       RangeStatus range_status;
+#ifndef VL53L1X_TINY
       float peak_signal_count_rate_MCPS;
       float ambient_count_rate_MCPS;
+#endif
     };
 
     RangingData ranging_data;

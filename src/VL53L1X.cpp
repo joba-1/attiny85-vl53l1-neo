@@ -1,12 +1,13 @@
+// The following is the Pololu Lib 1.0.1 adapted for ATTiny85/Digistump
+// All changes only if VL53L1X_TINY is defined 
+
 // Most of the functionality of this library is based on the VL53L1X API
 // provided by ST (STSW-IMG007), and some of the explanatory comments are quoted
 // or paraphrased from the API source code, API user manual (UM2356), and
 // VL53L1X datasheet.
 
-#define TINY
-
 #include <VL53L1X.h>
-#ifdef TINY
+#ifdef VL53L1X_TINY
   #include <TinyWireM.h>
   #define Wire   TinyWireM
 #else
@@ -452,8 +453,10 @@ uint16_t VL53L1X::read(bool blocking)
         did_timeout = true;
         ranging_data.range_status = None;
         ranging_data.range_mm = 0;
+#ifndef VL53L1X_TINY
         ranging_data.peak_signal_count_rate_MCPS = 0;
         ranging_data.ambient_count_rate_MCPS = 0;
+#endif
         return ranging_data.range_mm;
       }
     }
@@ -720,10 +723,12 @@ void VL53L1X::getRangingData()
   }
 
   // from SetSimpleData()
+#ifndef VL53L1X_TINY
   ranging_data.peak_signal_count_rate_MCPS =
     countRateFixedToFloat(results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0);
   ranging_data.ambient_count_rate_MCPS =
     countRateFixedToFloat(results.ambient_count_rate_mcps_sd0);
+#endif
 }
 
 // Decode sequence step timeout in MCLKs from register value
