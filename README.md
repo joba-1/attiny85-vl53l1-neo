@@ -3,6 +3,9 @@
 Displays a rainbow color dependent on current distance as measured by the VL53L1X.
 Colors selection adjusted automatically to range between min and max measured distance.
 
+ATTENTION: currently rainbow goes from red to red within 1m at most. Then strange things happen.
+Seems like there is some 8-bit problem in VL53L1X.cpp. Help (or just comments) via issues welcome :)
+
 ## Installation
 
 This is for VS Code, but should be easily adaptable to another PlatformIO environment or even Arduino IDE
