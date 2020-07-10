@@ -2,7 +2,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#include "VL53L0X.h"
+#include "VL53L1X.h"
 #include "TinyWireM.h"
 
 #define LED_PIN  1
@@ -14,7 +14,7 @@
 #define DELAY_MS 100
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, DATA_PIN, NEO_IO);
-VL53L0X tof;
+VL53L1X tof;
 
 uint32_t Wheel(byte WheelPos) {
   if (WheelPos < 85) {
@@ -46,24 +46,26 @@ void color(uint32_t c, unsigned long delay_ms ) {
 }
 
 void setup() {
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  // pinMode(LED_PIN, OUTPUT);
+  // digitalWrite(LED_PIN, LOW);
 
   strip.begin();
-  color(strip.Color(0,0,255), 100);
+  // color(strip.Color(64,64,255), 100);
 
   TinyWireM.begin();
 
-  color(strip.Color(255,255,0), 100);
+  // color(strip.Color(64,255,255), 100);
 
+  tof.setTimeout(500);
   if( tof.init(true) ) {
-    color(strip.Color(255,0,0), 100);
-    tof.setTimeout(500);
-    color(strip.Color(0,255,0), 100);
+    // (default after init()) tof.setDistanceMode(VL53L1X::Long);
+    // (default after init()) tof.setMeasurementTimingBudget(50000);
+    tof.startContinuous(50);
+    // color(strip.Color(64,255,64), 100);
   }
   else {
-    delay(1000);
-    color(strip.Color(255,0,255), 100);
+    // color(strip.Color(255,64,64), 100);
+    // delay(1000);
   }
 }
 
@@ -78,10 +80,11 @@ void loop() {
 
   // rainbow();
 
-  tof.writeReg(0x80, 0x01);      //set power mode to idle level 1
-  
-  uint16_t mm = tof.readRangeSingleMillimeters();
-  if( mm <= 2000 ) {
+  uint16_t mm = tof.read();
+  if( tof.timeoutOccurred() ) {
+    // color(strip.Color(255,64,255), 100);
+  }
+  else if( mm <= 4000 ) {
     if( mm >= max_mm ) {
       max_mm = mm + 1;
     }
@@ -94,8 +97,6 @@ void loop() {
       prev_mm = mm;
     }
   }
-
-  tof.writeReg(0x80, 0x00);   //set power mode to standby level 1
 
   delay(DELAY_MS);
 }

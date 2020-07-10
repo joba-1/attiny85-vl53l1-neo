@@ -1,8 +1,7 @@
-# Color Coded Distance with Neopixel and VL53L0X on Digispark/ATTiny85
+# Color Coded Distance with Neopixel and VL53L1X on Digispark/ATTiny85
 
-Not tested since I currently only have VL53L1X boards...
-Should display a rainbow color dependent on current distance. 
-Colors selection adjusted automatically to range between min and max measured distance
+Displays a rainbow color dependent on current distance as measured by the VL53L1X.
+Colors selection adjusted automatically to range between min and max measured distance.
 
 ## Installation
 
@@ -29,7 +28,7 @@ Short blink of onboard LED and Neopixels go white, then color changes depending 
     Gnd ----- -
     PB4 ----- Din
 
-    Digispark VL53L0X
+    Digispark VL53L1X
     5V ------ Vin
     Gnd ----- Gnd
     PB0 ----- SDA
