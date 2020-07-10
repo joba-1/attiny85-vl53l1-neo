@@ -16,15 +16,15 @@
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, DATA_PIN, NEO_IO);
 VL53L1X tof;
 
-uint32_t Wheel(byte WheelPos) {
+uint32_t Wheel( byte WheelPos ) {
   if (WheelPos < 85) {
-      return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+      return strip.Color(255 - WheelPos * 3, WheelPos * 3, 0);
   } else if (WheelPos < 170) {
       WheelPos -= 85;
-      return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+      return strip.Color(0, 255 - WheelPos * 3, WheelPos * 3);
   } else {
       WheelPos -= 170;
-      return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+      return strip.Color(WheelPos * 3, 0, 255 - WheelPos * 3);
   }
 }
 
@@ -45,28 +45,35 @@ void color(uint32_t c, unsigned long delay_ms ) {
   delay(delay_ms);
 }
 
+void alarm_color(uint32_t c, unsigned long delay_ms ) {
+  digitalWrite(LED_PIN, HIGH);
+  strip.setPixelColor(0, c);
+  strip.show();
+  delay(delay_ms);
+  digitalWrite(LED_PIN, LOW);
+}
+
 void setup() {
-  // pinMode(LED_PIN, OUTPUT);
-  // digitalWrite(LED_PIN, LOW);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
 
   strip.begin();
-  // color(strip.Color(64,64,255), 100);
 
   TinyWireM.begin();
 
-  // color(strip.Color(64,255,255), 100);
-
   tof.setTimeout(500);
-  if( tof.init(true) ) {
+  if( tof.init() ) {
     // (default after init()) tof.setDistanceMode(VL53L1X::Long);
     // (default after init()) tof.setMeasurementTimingBudget(50000);
     tof.startContinuous(50);
-    // color(strip.Color(64,255,64), 100);
+    alarm_color(strip.Color(64,255,64), 100); // light green: start ok
   }
   else {
-    // color(strip.Color(255,64,64), 100);
-    // delay(1000);
+    color(strip.Color(255,64,64), 100); // light red start error
+    delay(1000);
   }
+
+  digitalWrite(LED_PIN, LOW);
 }
 
 void loop() {
@@ -74,17 +81,15 @@ void loop() {
   static uint16_t min_mm = 0xffff;
   static uint16_t max_mm = 0;
 
-  // static int led = LOW;
-  // led = (led == LOW) ? HIGH : LOW;
-  // digitalWrite(LED_PIN, led);
-
-  // rainbow();
-
   uint16_t mm = tof.read();
+
   if( tof.timeoutOccurred() ) {
-    // color(strip.Color(255,64,255), 100);
+    alarm_color(strip.Color(255,64,255), 100); // light pink: timeout error
   }
-  else if( mm <= 4000 ) {
+  else if( mm > 4500 ) {
+    alarm_color(strip.Color(128,64,255), 100); // light violet: range error
+  }
+  else {
     if( mm >= max_mm ) {
       max_mm = mm + 1;
     }
@@ -93,7 +98,10 @@ void loop() {
     }
 
     if( mm != prev_mm ) {
-      color(Wheel(map(mm, min_mm, max_mm, 0, 256)), 0);
+      uint32_t fraction = mm - min_mm; // >= 0
+      fraction *= 256;                 // prepare scale for 0 .. 255
+      fraction /= (max_mm - min_mm);   // scales range (min .. max) to (0 .. 255)
+      color(Wheel(fraction), 0);
       prev_mm = mm;
     }
   }
