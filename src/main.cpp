@@ -3,11 +3,17 @@
 #include <Adafruit_NeoPixel.h>
 
 #include "VL53L1X.h"
-#include "TinyWireM.h"
 
-#define LED_PIN  1
+#ifdef VL53L1X_TINY
+  #include <TinyWireM.h>
+  #define Wire   TinyWireM
+#else
+  #include <Wire.h>
+#endif
 
-#define DATA_PIN 4
+#define LED_PIN  CONFIG_LED_PIN
+
+#define DATA_PIN CONFIG_DATA_PIN
 #define NUM_LEDS 2
 #define NEO_IO   (NEO_GRB+NEO_KHZ800)
 
@@ -57,9 +63,14 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
-  strip.begin();
+  Wire.begin();
 
-  TinyWireM.begin();
+  #ifndef VL53L1X_TINY
+    Serial.begin(115200);
+    Serial.println("\nVL53L1X Neo Test");
+  #endif
+
+  strip.begin();
 
   tof.setTimeout(500);
   if( tof.init() ) {
@@ -103,6 +114,9 @@ void loop() {
       fraction /= (max_mm - min_mm);   // scales range (min .. max) to (0 .. 255)
       color(Wheel(fraction), 0);
       prev_mm = mm;
+      #ifndef VL53L1X_TINY
+        Serial.printf("%5u %5u %5u\n", min_mm, mm, max_mm);
+      #endif
     }
   }
 

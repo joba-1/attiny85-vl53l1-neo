@@ -4,7 +4,10 @@ Displays a rainbow color dependent on current distance as measured by the VL53L1
 Colors selection adjusted automatically to range between min and max measured distance.
 
 ATTENTION: currently rainbow goes from red to red within 1m at most. Then strange things happen.
-Seems like there is some 8-bit problem in VL53L1X.cpp. Help (or just comments) via issues welcome :)
+There is some problem in VL53L1X.cpp. Millimeters go up to ~1000, then down again.
+Help (or just comments) via issues welcome :)
+Project now also supports ESP32 (debugging more easy). 
+Just enable environment esp32 and serial port in platformio.ini
 
 ## Installation
 
@@ -24,7 +27,7 @@ Now flashing begins automatically.
 After flashing is complete, sketch will start: 
 Short blink of onboard LED and Neopixels go white, then color changes depending on distance
 
-## Wiring of Digispark thumb and Neopixel
+## Wiring of Digistump, Neopixel and VL53L1X
 
     Digispark Neopixel
     5V ------ +
@@ -36,6 +39,22 @@ Short blink of onboard LED and Neopixels go white, then color changes depending 
     Gnd ----- Gnd
     PB0 ----- SDA
     PB2 ----- SCL
+
+## Wiring of ESP32, Neopixel and VL53L1X
+
+Pins for status LED and Neopixel data input are configurable.
+Change CONFIG_LED_PIN and CONFIG_DATA_PIN in platformio.ini
+
+    ESP32     Neopixel
+    Vin ----- +
+    Gnd ----- -
+    D5 ------ Din
+
+    ESP32     VL53L1X
+    Vin ----- Vin
+    Gnd ----- Gnd
+    D21 ----- SDA
+    D22 ----- SCL
 
 ## Power supply
 
