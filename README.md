@@ -3,10 +3,8 @@
 Displays a rainbow color dependent on current distance as measured by the VL53L1X.
 Colors selection adjusted automatically to range between min and max measured distance.
 
-ATTENTION: currently rainbow goes from red to red within 1m at most. Then strange things happen.
-There is some problem in VL53L1X.cpp. Millimeters go up to ~1000, then down again.
-Help (or just comments) via issues welcome :)
-Project now also supports ESP32 (debugging more easy). 
+Don't forget to remove protective cover from the sensor :D 
+If that doesn't help, this project now also supports ESP32 (debugging more easy). 
 Just enable environment esp32 and serial port in platformio.ini
 
 ## Installation
@@ -63,4 +61,5 @@ The digispark can be plugged into an USB port, any USB power supply or similar i
 You can also use the digispark pads 5V and Gnd. Maybe Vin (~7-30V) and Gnd works too. (not tested, consult your datasheet. Maybe you need to power your Neopixels 5V "+" seperately, but then don't forget to connect the "Gnd"s)
 
 Have fun,
+
 Joachim

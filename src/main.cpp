@@ -74,8 +74,8 @@ void setup() {
 
   tof.setTimeout(500);
   if( tof.init() ) {
-    // (default after init()) tof.setDistanceMode(VL53L1X::Long);
-    // (default after init()) tof.setMeasurementTimingBudget(50000);
+    tof.setDistanceMode(VL53L1X::Long);
+    tof.setMeasurementTimingBudget(50000);
     tof.startContinuous(50);
     alarm_color(strip.Color(64,255,64), 100); // light green: start ok
   }
@@ -91,16 +91,18 @@ void loop() {
   static uint16_t prev_mm = 0;
   static uint16_t min_mm = 0xffff;
   static uint16_t max_mm = 0;
+  static uint8_t num_errors = 0;
 
   uint16_t mm = tof.read();
 
   if( tof.timeoutOccurred() ) {
-    alarm_color(strip.Color(255,64,255), 100); // light pink: timeout error
+    alarm_color(strip.Color(32,32,32), 100); // dimm white: timeout error
   }
-  else if( mm > 4500 ) {
-    alarm_color(strip.Color(128,64,255), 100); // light violet: range error
+  else if( tof.ranging_data.range_status != VL53L1X::RangeValid && num_errors++ > 10 ) {
+    alarm_color(strip.Color(0,0,0), 100); // off: range error
   }
-  else {
+  else if ( tof.ranging_data.range_status == VL53L1X::RangeValid ) {
+    num_errors = 0;
     if( mm >= max_mm ) {
       max_mm = mm + 1;
     }
@@ -115,7 +117,9 @@ void loop() {
       color(Wheel(fraction), 0);
       prev_mm = mm;
       #ifndef VL53L1X_TINY
-        Serial.printf("%5u %5u %5u\n", min_mm, mm, max_mm);
+        Serial.printf("%5u %5u %5u peak: %f, amb: %f, %s\n", min_mm, mm, max_mm, 
+          tof.ranging_data.peak_signal_count_rate_MCPS, tof.ranging_data.ambient_count_rate_MCPS,
+          VL53L1X::rangeStatusToString(tof.ranging_data.range_status));
       #endif
     }
   }
